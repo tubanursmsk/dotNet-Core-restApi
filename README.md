@@ -81,6 +81,9 @@ Projeyi çalıştırdıktan sonra Swagger arayüzüne giderek tüm endpoint'leri
 Swagger UI Adresi: https://localhost:5223/swagger
 ```
 
+<img width="960" height="517" alt="image" src="https://github.com/user-attachments/assets/f8b1ceaa-f803-403b-b31f-54aa0e5655f4" />
+
+
 ---
 
 ##  Ana Endpoint'ler
@@ -116,9 +119,13 @@ Swagger UI Adresi: https://localhost:5223/swagger
   
 <img width="683" height="369" alt="appointmentAdd" src="https://github.com/user-attachments/assets/e8a76eca-1ed4-45f6-af01-d57d2eda76a8" />
 
+---
+
 - Randevu saatlerinde çakışma
   
 <img width="683" height="369" alt="randevu çakışması" src="https://github.com/user-attachments/assets/16c40ca6-9f79-4d5d-9035-5dea25bfc8e9" />
+
+---
 
 - Müşterinin istediği saatler doluysa en uygun beş randevu önerisi sunar.
 
@@ -129,7 +136,12 @@ Swagger UI Adresi: https://localhost:5223/swagger
 ### 📸 DataBase  Görselleri
 <img width="683" height="369" alt="image" src="https://github.com/user-attachments/assets/bd3ee098-f87a-4cfb-87a0-2265b58ee474" />
 
+---
+
 <img width="683" height="369" alt="servicesdb" src="https://github.com/user-attachments/assets/3e759122-ae0f-41ac-88cb-e497b437e028" />
+
+---
+
 
 <img width="683" height="369" alt="usedb" src="https://github.com/user-attachments/assets/abf82d3f-af3e-411c-881c-e3b7a7777be0" />
 
