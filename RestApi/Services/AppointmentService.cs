@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -16,6 +17,8 @@ namespace RestApi.Services
 
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
+        TimeZoneInfo turkeyTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
+
         public AppointmentService(ApplicationDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
@@ -24,9 +27,8 @@ namespace RestApi.Services
 
         public object Add(AppointmentAddDto appointmentAddDto, string? userId)
         {
-            if (string.IsNullOrEmpty(userId) || !long.TryParse(userId, out var userIdValue))
-                return "Kullanıcı ID geçersiz.";
 
+            long userIdValue = AppointmentDataControl(appointmentAddDto, userId);
             var appointment = _mapper.Map<Appointment>(appointmentAddDto);
             appointment.UserId = userIdValue;
 
@@ -92,9 +94,9 @@ namespace RestApi.Services
         //requestedDate --> müşterinin istediği tarih
         //en son return de de en fazla 5 tane uygun tarih döndürdük
         //** slot = sıra
-        private List<DateTime> FindAvailableSlots(long staffId, double serviceDuration, DateTime requestedDate)
+        private List<string> FindAvailableSlots(long staffId, double serviceDuration, DateTime requestedDate)
         {
-            var suggestions = new List<DateTime>();
+            var suggestions = new List<string>();
             var workingDayStart = new TimeSpan(9, 0, 0);  // Sabah 09:00
             var workingDayEnd = new TimeSpan(18, 0, 0);   // Akşam 18:00
             var slotCheckInterval = 30; // 30 dakikalık aralıklarla kontrol et (örn: 09:00, 09:30, 10:00)
@@ -151,7 +153,11 @@ namespace RestApi.Services
 
                     if (!isSlotBusy)
                     {
-                        suggestions.Add(slotStart); // Uygun slot!
+                        // Türkiye saat dilimine çevir ve ISO 8601 +03:00 formatında string yap
+                        var turkeyTime = TimeZoneInfo.ConvertTime(slotStart, turkeyTimeZone);
+                        var slotString = new DateTimeOffset(turkeyTime, turkeyTimeZone.GetUtcOffset(turkeyTime))
+                                        .ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
+                        suggestions.Add(slotString);
                     }
 
                     // Bir sonraki potansiyel slota geç
@@ -160,5 +166,78 @@ namespace RestApi.Services
             }
             return suggestions;
         }
+
+        private long AppointmentDataControl(AppointmentAddDto appointmentAddDto, string? userId)
+        {
+            // userId değer olarak long mu?
+            if (string.IsNullOrEmpty(userId) || !long.TryParse(userId, out var userIdValue))
+                throw new BadHttpRequestException("Kullanıcı ID geçersiz!");
+
+            // uzman kontolü
+            var staffUser = _dbContext.Users.FirstOrDefault(item =>
+                item.Role.Contains("Staff") && item.Id == appointmentAddDto.StaffId
+            );
+            if (staffUser == null)
+                throw new BadHttpRequestException("Böyle bir uzman yok!");
+
+            // uzman kendisi mi?    
+            if (staffUser.Id == userIdValue)
+                throw new BadHttpRequestException("Kendinize randevu alamazsınız!");
+            return userIdValue;
+        }
+
+        public object ListUpcomingByStaff(string? userId)
+        {
+            if (string.IsNullOrEmpty(userId) || !long.TryParse(userId, out var staffId))
+                throw new BadHttpRequestException("Kullanıcı ID geçersiz!");
+
+            var now = DateTime.Now;
+            var appointments = _dbContext.Appointments
+            .Include(a => a.Service)
+            .Include(a => a.User)
+            .Where(a => a.StaffId == staffId && a.AppointmentDate > now)
+            .OrderBy(a => a.AppointmentDate)
+            .Select(a => new
+            {
+                a.Aid,
+                a.AppointmentDate,
+                a.Status,
+                Service = new
+                {
+                    a.Service.Sid,
+                    a.Service.Name,
+                    a.Service.Detail,
+                    a.Service.DurationMinute,
+                    a.Service.Price
+                },
+                User = new
+                {
+                    a.User.Id,
+                    a.User.FirstName,
+                    a.User.LastName,
+                    a.User.Email
+                }
+            })
+            .ToList();
+            return appointments;
+        }
+
+
+        public object AppointmentChangeStatus(string? userId, AppointmentStatusChangeDto appointmentStatusChangeDto)
+        {
+            if (string.IsNullOrEmpty(userId) || !long.TryParse(userId, out var staffId))
+                throw new BadHttpRequestException("Kullanıcı ID geçersiz!");
+
+            var appointment = _dbContext.Appointments.FirstOrDefault(item =>
+                item.StaffId == staffId &&
+                item.Aid == appointmentStatusChangeDto.AppointmentId
+            ) ?? throw new BadHttpRequestException("Kullanıcı ID geçersiz yada Yetki hatası!");
+
+            appointment.Status = appointmentStatusChangeDto.Status;
+            _dbContext.SaveChanges();
+
+            return appointment;
+        }
+
     }
 }

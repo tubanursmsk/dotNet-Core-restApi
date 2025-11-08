@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestApi.Dto.AppointmentDto;
+using RestApi.Models;
 using RestApi.Services;
 
 namespace RestApi.Controllers
@@ -24,5 +25,25 @@ namespace RestApi.Controllers
             var appointment = _appointmentService.Add(appointmentAddDto, UserId);
             return Ok(appointment);
         }
+
+        [HttpGet("list")]
+        [Authorize(Roles = "Staff")]
+        public ActionResult AppointmentList()
+        {
+            var UserId = User.FindFirst("id")?.Value;
+            var list = _appointmentService.ListUpcomingByStaff(UserId);
+            return Ok(list);
+        }
+
+        [HttpPatch("changeStatus")]
+        [Authorize(Roles = "Staff")]
+        public ActionResult ChangeStatus(AppointmentStatusChangeDto appointmentStatusChangeDto)
+        {
+            var UserId = User.FindFirst("id")?.Value;
+            var statusObj =_appointmentService.AppointmentChangeStatus(UserId, appointmentStatusChangeDto);
+            return Ok(statusObj);
+        }
+
+
     }
 }
