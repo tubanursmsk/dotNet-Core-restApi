@@ -127,6 +127,20 @@ Swagger UI Adresi: https://localhost:5223/swagger
 
 ---
 
+### GET /api/appointment/list
+- Randevuları listeler
+
+<img width="683" height="369" alt="appointment-list" src="https://github.com/user-attachments/assets/3308bd37-3829-49cb-aac4-7dd685abaee9" />
+
+---
+
+### PATCH /api/appointment/changeStatus
+- Randevunun gerçekleşme durumunu ifade eder
+
+<img width="683" height="369" alt="appointment-changeStatus" src="https://github.com/user-attachments/assets/1d2b12b1-b3b8-4fa4-a10d-6c8f5f06c6cb" />
+
+---
+
 - Müşterinin istediği saatler doluysa en uygun beş randevu önerisi sunar.
 
  <img width="683" height="369" alt="İstediğiniz saat dolu  Alternatif saatler önersi" src="https://github.com/user-attachments/assets/521519eb-5642-4c1d-a421-177c8b1ab7cc" />
