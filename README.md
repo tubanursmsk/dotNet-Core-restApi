@@ -127,6 +127,12 @@ Swagger UI Adresi: https://localhost:5223/swagger
 
 ---
 
+- Müşterinin istediği saatler doluysa en uygun beş randevu önerisi sunar.
+
+ <img width="683" height="369" alt="İstediğiniz saat dolu  Alternatif saatler önersi" src="https://github.com/user-attachments/assets/521519eb-5642-4c1d-a421-177c8b1ab7cc" />
+
+---
+
 ### GET /api/appointment/list
 - Randevuları listeler
 
@@ -141,11 +147,6 @@ Swagger UI Adresi: https://localhost:5223/swagger
 
 ---
 
-- Müşterinin istediği saatler doluysa en uygun beş randevu önerisi sunar.
-
- <img width="683" height="369" alt="İstediğiniz saat dolu  Alternatif saatler önersi" src="https://github.com/user-attachments/assets/521519eb-5642-4c1d-a421-177c8b1ab7cc" />
-
----
 
 ### 📸 DataBase  Görselleri
 <img width="683" height="369" alt="image" src="https://github.com/user-attachments/assets/bd3ee098-f87a-4cfb-87a0-2265b58ee474" />
