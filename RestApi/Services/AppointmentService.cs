@@ -98,7 +98,7 @@ namespace RestApi.Services
         {
             var suggestions = new List<string>();
             var workingDayStart = new TimeSpan(9, 0, 0);  // Sabah 09:00
-            var workingDayEnd = new TimeSpan(18, 0, 0);   // Akşam 18:00
+            var workingDayEnd = new TimeSpan(17, 0, 0);   // Akşam 17:00
             var slotCheckInterval = 30; // 30 dakikalık aralıklarla kontrol et (örn: 09:00, 09:30, 10:00)
             var daySearchRange = new List<int> { 0, -1, 1, -2, 2 }; // Önce aynı gün, sonra +/- 1 gün, sonra +/- 2 gün  !!ancak güncel tarihten öncesi olamaz
 
@@ -237,6 +237,47 @@ namespace RestApi.Services
             _dbContext.SaveChanges();
 
             return appointment;
+        }
+
+        public object AppointmentUserList(string? userId)
+        {
+            if (string.IsNullOrEmpty(userId) || !long.TryParse(userId, out var userID))
+                return new BadHttpRequestException("Kullanıcı ID geçersiz.");
+            
+            var now = DateTime.Now;
+            var appointments = _dbContext.Appointments
+            .Include(a => a.Service)
+            .Include(a => a.Staff)
+            .Where(a => a.UserId == userID && a.AppointmentDate > now)
+            .OrderBy(a => a.AppointmentDate)
+            .Select(a => new
+            {
+                a.Aid,
+                a.AppointmentDate,
+                a.Status,
+                Service = new
+                {
+                    a.Service.Sid,
+                    a.Service.Name,
+                    a.Service.Detail,
+                    a.Service.DurationMinute,
+                    a.Service.Price
+                },
+                Staff = new
+                {
+                    a.Staff.Id,
+                    a.Staff.FirstName,
+                    a.Staff.LastName,
+                    a.Staff.Email
+                }
+            })
+            .ToList();
+            if (appointments.Count == 0)
+            {
+                return new { message = "Güncel randevunuz yok" };
+            }
+            return appointments;
+        
         }
 
     }
