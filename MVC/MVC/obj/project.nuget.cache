@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "r1h8j/H2dHY=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\PC\\Documents\\dotNet-Core-restApi\\MVC\\MVC\\MVC.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\PC\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\10.0.0\\microsoft.entityframeworkcore.tools.10.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
